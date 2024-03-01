@@ -22,7 +22,7 @@ type TArray = {
 
 export const SortingPage: React.FC = () => {
   const [array, setArray] = useState<TArray[]>([]);
-  const [sortingType, setSortingType] = useState<'select' | 'bobble'>('select');
+  const [sortingType, setSortingType] = useState<'select' | 'bubble'>('select');
   const [isLoading, setIsLoading] = useState<TButtonsState>({
     ascBtn: false,
     descBtn: false,
@@ -82,10 +82,11 @@ export const SortingPage: React.FC = () => {
     setArray([...arr]);
   };
 
-  const onAscBtn = async () => {
+  const onAscBtn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsLoading({ ...isLoading, ascBtn: true });
     setIsDisabled({ ...isDisabled, descBtn: true, newArrBtn: true });
-    sortingType === 'bobble' ? await bubbleSort(array, Direction.Ascending) : await selectSort(array, Direction.Ascending)
+    sortingType === 'bubble' ? await bubbleSort(array, Direction.Ascending) : await selectSort(array, Direction.Ascending)
     setIsLoading({ ...isLoading, ascBtn: false })
     setIsDisabled({ ...isDisabled, descBtn: false, newArrBtn: false });
   }
@@ -93,7 +94,7 @@ export const SortingPage: React.FC = () => {
   const onDescBtn = async () => {
     setIsLoading({ ...isLoading, descBtn: true });
     setIsDisabled({ ...isDisabled, ascBtn: true, newArrBtn: true });
-    sortingType === 'bobble' ? await bubbleSort(array, Direction.Descending) : await selectSort(array, Direction.Descending)
+    sortingType === 'bubble' ? await bubbleSort(array, Direction.Descending) : await selectSort(array, Direction.Descending)
     setIsLoading({ ...isLoading, descBtn: false });
     setIsDisabled({ ...isDisabled, ascBtn: false, newArrBtn: false });
   }
@@ -106,7 +107,7 @@ export const SortingPage: React.FC = () => {
 
   return (
     <SolutionLayout title="Сортировка массива">
-      <form className={s.form}>
+      <form className={s.form} onSubmit={onAscBtn}>
         <RadioInput
           label="Выбор"
           onChange={() => setSortingType('select')}
@@ -114,13 +115,13 @@ export const SortingPage: React.FC = () => {
         />
         <RadioInput
           label="Пузырек"
-          onChange={() => setSortingType('bobble')}
-          checked={sortingType === 'bobble'}
+          onChange={() => setSortingType('bubble')}
+          checked={sortingType === 'bubble'}
         />
         <Button
           text='По возрастанию'
           isLoader={isLoading.ascBtn}
-          onClick={onAscBtn}
+          type='submit'
           sorting={Direction.Ascending}
           disabled={isDisabled.ascBtn}
         />

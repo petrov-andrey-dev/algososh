@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { DELAY_IN_MS } from "../../constants/delays";
 import { HEAD, TAIL } from "../../constants/element-captions";
+import { useForm } from "../../hooks/useForm";
 import { TCircleObject } from "../../types/circle";
 import { ElementStates } from "../../types/element-states";
 import { mutateCircle, randomArr, timeout } from "../../utils/utils";
@@ -19,18 +20,20 @@ type TButtonsState = {
   delFromTailBtn: boolean;
   addByIndexBtn: boolean;
   delByIndexBtn: boolean;
-}
+};
+
+type TInput = {
+  string: string;
+  index: number |null;
+};
 
 const linkedList = new LinkedList<string>()
-randomArr(4, 4).map(i => linkedList.addToHead(i.toString()))
 
 export const ListPage: React.FC = () => {
-
   const [list, setList] = useState<TCircleObject[]>([]);
-  const [string, setString] = useState<string>('');
-  const [index, setIndex] = useState<number>(0);
   const [deletingValue, setDeletingValue] = useState<string>('');
   const [pointer, setPointer] = useState<number>(-1);
+  const {values, handleChange, setValues} = useForm<TInput>({string: '', index: null})
   const [isLoading, setIsLoading] = useState<TButtonsState>({
     addToHeadBtn: false,
     addToTailBtn: false,
@@ -49,6 +52,9 @@ export const ListPage: React.FC = () => {
   });
 
   useEffect(() => {
+    if (linkedList.getSize() < 4) {
+      randomArr(4 - linkedList.getSize(), 4 -linkedList.getSize()).map(i => linkedList.addToTail(i.toString()))
+    }
     setList(linkedList.toArray().map(i => {
       return { value: i.value, state: ElementStates.Default }
     }))
@@ -60,19 +66,11 @@ export const ListPage: React.FC = () => {
     }))
   };
 
-  const handleOnStringChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setString(e.currentTarget.value)
-  };
-
-  const handleOnIndexChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setIndex(Number(e.currentTarget.value))
-
-  };
-
-  const onAddToHeadBtn = async () => {
+  const onAddToHeadBtn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsLoading({ ...isLoading, addToHeadBtn: true });
     setAction({ ...action, addToHeadBtn: true });
-    linkedList.addToHead(string);
+    linkedList.addToHead(values.string);
     await timeout(DELAY_IN_MS);
     setAction({ ...action, addToHeadBtn: false });
     updateList(linkedList);
@@ -80,13 +78,13 @@ export const ListPage: React.FC = () => {
     await timeout(DELAY_IN_MS);
     mutateCircle(setList, list, 0, ElementStates.Default);
     setIsLoading({ ...isLoading, addToHeadBtn: false });
-    setString('');
+    setValues({...values, string: ''});
   };
 
   const onAddToTailBtn = async () => {
     setIsLoading({ ...isLoading, addToTailBtn: true });
     setAction({ ...action, addToTailBtn: true });
-    linkedList.addToTail(string);
+    linkedList.addToTail(values.string);
     await timeout(DELAY_IN_MS);
     setAction({ ...action, addToTailBtn: false });
     updateList(linkedList);
@@ -94,7 +92,7 @@ export const ListPage: React.FC = () => {
     await timeout(DELAY_IN_MS);
     mutateCircle(setList, list, list.length, ElementStates.Default);
     setIsLoading({ ...isLoading, addToTailBtn: false });
-    setString('');
+    setValues({...values, string: ''});
   };
 
   const onDelFromHeadBtn = async () => {
@@ -121,67 +119,72 @@ export const ListPage: React.FC = () => {
     setAction({ ...action, delFromHeadBtn: false });
   };
 
-  const onAddByIndexBtn = async () => {
-    setIsLoading({ ...isLoading, addByIndexBtn: true });
-    setAction({ ...action, addByIndexBtn: true });
-    linkedList.addByIndex(string, index);
-    for (let i = 0; i <= index; i++) {
-      setPointer(i);
-      mutateCircle(setList, list, i - 1, ElementStates.Changing);
+  const onAddByIndexBtn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (values.index !== null && values.index >= 0) {
+      setIsLoading({ ...isLoading, addByIndexBtn: true });
+      setAction({ ...action, addByIndexBtn: true });
+      linkedList.addByIndex(values.string, values.index);
+      for (let i = 0; i <= values.index; i++) {
+        setPointer(i);
+        mutateCircle(setList, list, i - 1, ElementStates.Changing);
+        await timeout(DELAY_IN_MS);
+      }
       await timeout(DELAY_IN_MS);
+      updateList(linkedList);
+      setAction({ ...action, addByIndexBtn: false });
+      mutateCircle(setList, list, values.index, ElementStates.Modified);
+      await timeout(DELAY_IN_MS);
+      mutateCircle(setList, list, values.index, ElementStates.Default);
+      setIsLoading({ ...isLoading, addByIndexBtn: false });
+      setPointer(-1);
+      setValues({string: '', index: null})
     }
-    await timeout(DELAY_IN_MS);
-    updateList(linkedList);
-    setAction({ ...action, addByIndexBtn: false });
-    mutateCircle(setList, list, index, ElementStates.Modified);
-    await timeout(DELAY_IN_MS);
-    mutateCircle(setList, list, index, ElementStates.Default);
-    setIsLoading({ ...isLoading, addByIndexBtn: false });
-    setPointer(-1);
-    setString('');
-    setIndex(0);
-  }
+  };
 
   const onDelByIndexBtn = async () => {
-    setIsLoading({ ...isLoading, delByIndexBtn: true });
-    linkedList.delByIndex(index);
-    for (let i = 0; i <= index; i++) {
-      setPointer(i);
-      mutateCircle(setList, list, i, ElementStates.Changing);
+    if (values.index !== null && values.index >= 0) {
+      setIsLoading({ ...isLoading, delByIndexBtn: true });
+      linkedList.delByIndex(values.index);
+      for (let i = 0; i <= values.index; i++) {
+        setPointer(i);
+        mutateCircle(setList, list, i, ElementStates.Changing);
+        await timeout(DELAY_IN_MS);
+      }
+      setAction({ ...action, delByIndexBtn: true });
+      setDeletingValue(list[values.index].value);
+      mutateCircle(setList, list, values.index, ElementStates.Default, '');
       await timeout(DELAY_IN_MS);
+      setAction({ ...action, delByIndexBtn: false });
+      updateList(linkedList);
+      setIsLoading({ ...isLoading, delByIndexBtn: false });
+      setValues({...values, index: null});
     }
-    setAction({ ...action, delByIndexBtn: true });
-    setDeletingValue(list[index].value);
-    mutateCircle(setList, list, index, ElementStates.Default, '');
-    await timeout(DELAY_IN_MS);
-    setAction({ ...action, delByIndexBtn: false });
-    updateList(linkedList);
-    setIsLoading({ ...isLoading, delByIndexBtn: false });
-    setIndex(0);
-  }
+  };
 
   return (
     <SolutionLayout title="Связный список">
-      <form className={s.form}>
+      <form className={s.form} onSubmit={onAddToHeadBtn}>
         <Input
-          value={string}
+          value={values.string}
           maxLength={4}
-          onChange={handleOnStringChange}
+          onChange={handleChange}
           isLimitText={true}
           extraClass={s.input}
+          name='string'
         />
         <Button
           text='Добавить в head'
           isLoader={isLoading.addToHeadBtn}
-          onClick={onAddToHeadBtn}
-          disabled={string.length === 0 || list.length === 10}
+          type='submit'
+          disabled={values.string.length === 0 || list.length === 10}
           extraClass={s.button}
         />
         <Button
           text='Добавить в tail'
           isLoader={isLoading.addToTailBtn}
           onClick={onAddToTailBtn}
-          disabled={string.length === 0}
+          disabled={values.string.length === 0 || list.length === 10}
           extraClass={s.button}
         />
         <Button
@@ -199,28 +202,40 @@ export const ListPage: React.FC = () => {
           extraClass={s.button}
         />
       </form>
-      <form className={s.form}>
+      <form className={s.form} onSubmit={onAddByIndexBtn}>
         <Input
           min={0}
           max={list.length - 1}
-          value={index}
-          onChange={handleOnIndexChange}
+          value={values.index === null ? '' : values.index}
+          onChange={handleChange}
           isLimitText={true}
           type='number'
           extraClass={s.input}
+          name='index'
         />
         <Button
           text='Добавить по индексу'
-          onClick={onAddByIndexBtn}
+          type='submit'
           isLoader={isLoading.addByIndexBtn}
-          disabled={index === null || string.length === 0 || list.length === 10}
+          disabled={
+            values.index === null
+            || values.index < 0
+            || values.index > list.length - 1
+            || values.string.length === 0
+            || list.length === 10
+          }
           extraClass={s.bigButton}
         />
         <Button
           text='Удалить по индексу'
           onClick={onDelByIndexBtn}
           isLoader={isLoading.delByIndexBtn}
-          disabled={index === null}
+          disabled={
+            values.index === null 
+            || values.index < 0
+            || values.index > list.length - 1
+            || list.length === 0 
+          }
           extraClass={s.bigButton}
         />
       </form>
@@ -237,7 +252,7 @@ export const ListPage: React.FC = () => {
                     (action.addToHeadBtn && index === 0)
                       || (action.addToTailBtn && index === list.length - 1)
                       || (action.addByIndexBtn && index === pointer)
-                      ? <Circle isSmall={true} state={ElementStates.Changing} letter={string} />
+                      ? <Circle isSmall={true} state={ElementStates.Changing} letter={values.string} />
                       : null
                         || index === 0 ? HEAD : null
                   }
@@ -247,10 +262,10 @@ export const ListPage: React.FC = () => {
                       || (action.delByIndexBtn && index === pointer)
                       ? <Circle isSmall={true} state={ElementStates.Changing} letter={deletingValue} />
                       : null
-                        || index === list.length - 1 ? TAIL : null
+                        || values.index === list.length - 1 ? TAIL : null
                   }
                 />
-                {index !== list.length - 1 && <ArrowIcon />}
+                {values.index !== list.length - 1 && <ArrowIcon />}
               </li>
             )
           })

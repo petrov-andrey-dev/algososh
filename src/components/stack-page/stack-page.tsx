@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
+import { useForm } from "../../hooks/useForm";
 import { TCircleObject } from "../../types/circle";
 import { ElementStates } from "../../types/element-states";
 import { mutateCircle, timeout } from "../../utils/utils";
@@ -12,27 +13,27 @@ import s from "./stack-page.module.css";
 type TButtonsState = {
   pushBtn: boolean;
   popBtn: boolean;
-}
+};
+
+type TInput = {
+  string: string;
+};
 
 export const StackPage: React.FC = () => {
   const [stack, setStack] = useState<TCircleObject[]>([]);
-  const [string, setString] = useState<string>('')
+  const {values, handleChange, setValues} = useForm<TInput>({string: ''});
   const [isLoading, setIsLoading] = useState<TButtonsState>({
     pushBtn: false,
     popBtn: false
   });
 
-  const handleOnChange = (e: React.FormEvent<HTMLInputElement>) => {
-    setString(e.currentTarget.value)
-  };
-
   const pushItem = async (str: string) => {
-    if (string.length) {
+    if (values.string.length && stack.length <= 19) {
       const newElement = { value: str, state: ElementStates.Changing };
       setStack(stack => [...stack, newElement]);
       await timeout(SHORT_DELAY_IN_MS);
       mutateCircle(setStack, stack, stack.length, ElementStates.Default);
-      setString('');
+      setValues({string: ''});
     }
   };
 
@@ -44,46 +45,48 @@ export const StackPage: React.FC = () => {
     }
   };
 
-  const onAddButton = async (e: React.FormEvent<HTMLButtonElement>) => {
+  const onAddButton = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setIsLoading({ ...isLoading, pushBtn: true });
-    await pushItem(string);
+    await pushItem(values.string);
     setIsLoading({ ...isLoading, pushBtn: false });
   };
 
-  const onRemoveButton = async (e: React.FormEvent<HTMLButtonElement>) => {
+  const onRemoveButton = async () => {
     setIsLoading({ ...isLoading, popBtn: true });
     await popItem();
     setIsLoading({ ...isLoading, popBtn: false });
   };
 
-  const onClearButton = async (e: React.FormEvent<HTMLButtonElement>) => {
+  const onClearButton = async () => {
     setStack([])
   };
 
   return (
     <SolutionLayout title="Стек">
-      <form className={s.form}>
+      <form className={s.form} onSubmit={onAddButton}>
         <Input
-          value={string}
+          value={values.string}
           maxLength={4}
-          onChange={handleOnChange}
+          onChange={handleChange}
           isLimitText={true}
+          name='string'
         />
         <Button
           text='Добавить'
           isLoader={isLoading.pushBtn}
-          onClick={e => onAddButton(e)}
-          disabled={string.length === 0}
+          type='submit'
+          disabled={values.string.length === 0 || stack.length >= 20}
         />
         <Button
           text='Удалить'
           isLoader={isLoading.popBtn}
-          onClick={e => onRemoveButton(e)}
+          onClick={onRemoveButton}
           disabled={stack.length === 0}
         />
         <Button
           text='Очистить'
-          onClick={e => onClearButton(e)}
+          onClick={onClearButton}
           disabled={stack.length === 0}
           extraClass={s.ml}
         />

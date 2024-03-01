@@ -24,9 +24,15 @@ const randomArr = (min: number, max: number) => {
   return arr;
 }
 
-const mutateCircle = (func: React.Dispatch<React.SetStateAction<TCircleObject[]>> ,arr: TCircleObject[], index: number, state: ElementStates , value?: string) => {
+const mutateCircle = (
+  func: React.Dispatch<React.SetStateAction<TCircleObject[]>>,
+  arr: TCircleObject[],
+  index: number,
+  state: ElementStates,
+  value?: string
+) => {
   func(arr => arr.map((item, currIndex) => {
-    if (currIndex === index) {
+    if (currIndex === Number(index)) {
       return value != null ? {value, state} : {...item, state}
     } else {
       return item;
