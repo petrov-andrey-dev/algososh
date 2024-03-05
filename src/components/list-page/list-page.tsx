@@ -160,7 +160,7 @@ export const ListPage: React.FC = () => {
       setIsLoading({ ...isLoading, delByIndexBtn: false });
       setValues({...values, index: null});
     }
-  };
+  };  
 
   return (
     <SolutionLayout title="Связный список">
@@ -257,15 +257,15 @@ export const ListPage: React.FC = () => {
                         || index === 0 ? HEAD : null
                   }
                   tail={
-                    (action.delFromHeadBtn && index === 0)
+                    ((action.delFromHeadBtn && index === 0)
                       || (action.delFromTailBtn && index === list.length - 1)
                       || (action.delByIndexBtn && index === pointer)
                       ? <Circle isSmall={true} state={ElementStates.Changing} letter={deletingValue} />
-                      : null
-                        || values.index === list.length - 1 ? TAIL : null
+                      : null)
+                        || index === list.length - 1 ? TAIL : null
                   }
                 />
-                {values.index !== list.length - 1 && <ArrowIcon />}
+                {index !== list.length - 1 && <ArrowIcon />}
               </li>
             )
           })

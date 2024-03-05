@@ -66,9 +66,9 @@ export const SortingPage: React.FC = () => {
         arr[i].state = arr[j].state = ElementStates.Changing;
         setArray([...arr]);
         await timeout(SHORT_DELAY_IN_MS);
-        if (direction === Direction.Ascending && arr[j].value > arr[min].value) {
+        if (direction === Direction.Ascending && arr[j].value < arr[min].value) {
           min = j;
-        } else if (direction === Direction.Descending && arr[j].value < arr[min].value) {
+        } else if (direction === Direction.Descending && arr[j].value > arr[min].value) {
           min = j;
         }
         arr[j].state = ElementStates.Default;
