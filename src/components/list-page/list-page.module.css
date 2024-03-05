@@ -1,0 +1,33 @@
+.form {
+    display: flex;
+    width: 952px;
+    gap: 12px;
+    margin: auto;
+}
+
+.ul {
+    margin: auto;
+    margin-top: 86px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+}
+
+.li {
+    all: unset;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.input {
+    max-width: 204px;
+}
+
+.button {
+    width: 175px;
+}
+
+.bigButton {
+    width: 362px;
+}

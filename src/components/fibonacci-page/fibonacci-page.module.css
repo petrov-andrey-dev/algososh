@@ -1,0 +1,21 @@
+.form {
+    display: flex;
+    width: 522px;
+    gap: 12px;
+    margin: auto;
+}
+
+.ul {
+    max-width: 944px;
+    margin: auto;
+    margin-top: 120px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    row-gap: 48px;
+    flex-wrap: wrap;
+}
+
+.li {
+    all: unset;
+}

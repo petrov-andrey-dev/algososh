@@ -1,0 +1,25 @@
+.form {
+    display: flex;
+    max-width: 829px;
+    gap: 12px;
+    margin: auto;
+    align-items: center;
+}
+
+.ul {
+    height: 350px;
+    margin: auto;
+    margin-top: 40px;
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    align-items: end;
+}
+
+.li {
+    all: unset;
+}
+
+.ml {
+    margin-left: 50px;
+}
