@@ -16,6 +16,7 @@ describe('Страница Стек работает корректно', () => 
       cy.get('input').type(item);
       cy.contains('Добавить').click();
       cy.get('[class^=circle_circle]').as('circle');
+     
       cy.get('@circle')
         .should('have.length', arrIndex + 1)
         .each(($el, index) => {
@@ -35,6 +36,7 @@ describe('Страница Стек работает корректно', () => 
             expect($el).to.have.css('border-color', 'rgb(0, 50, 255)')
           }
         });
+        cy.contains('Добавить').should('be.disabled');
     });
   });
 
@@ -42,6 +44,7 @@ describe('Страница Стек работает корректно', () => 
     array.forEach(i => {
       cy.get('input').type(i);
       cy.contains('Добавить').click();
+      cy.contains('Добавить').should('be.disabled');
     });
     cy.contains('Удалить').click();
     cy.get('[class^=circle_circle]').as('circle');
@@ -63,6 +66,7 @@ describe('Страница Стек работает корректно', () => 
     array.forEach(i => {
       cy.get('input').type(i);
       cy.contains('Добавить').click();
+      cy.contains('Добавить').should('be.disabled');
     })
     cy.contains('Очистить').click();
     cy.get('[class^=circle_circle]')
