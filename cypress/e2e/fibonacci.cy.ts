@@ -19,7 +19,7 @@ describe('Страница Последовательность Фибоначч
       .should('have.length', 1)
       .each(($el, index) => {
         cy.wrap($el).should('have.css', 'border-color', 'rgb(0, 50, 255)');
-        if (index === 0) expect($el).to.contain('1');
+        expect($el).to.contain('1');
       })
 
     cy.wait(SHORT_DELAY_IN_MS);

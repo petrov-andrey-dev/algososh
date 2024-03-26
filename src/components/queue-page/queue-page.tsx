@@ -50,7 +50,6 @@ export const QueuePage: React.FC = () => {
       setIsLoading({ ...isLoading, dequeueBtn: true });
       newQueue.changeHeadItem({value: newQueue.getItems()[newQueue.getHead()].value, state: ElementStates.Changing});
       setQueue([...newQueue.getItems()]);
-      console.log(newQueue.getItems()[newQueue.getHead()]);
       await timeout(SHORT_DELAY_IN_MS);
       newQueue.dequeue({value: '', state: ElementStates.Default});
       setQueue([...newQueue.getItems()]);

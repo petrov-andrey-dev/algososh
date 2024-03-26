@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { useForm } from "../../hooks/useForm";
 import { TCircleObject } from "../../types/circle";
@@ -54,7 +54,7 @@ export const StackPage: React.FC = () => {
 
   const onClearButton = () => {
     newStack.clear();
-    setStack([...newStack.getItems()]);
+    setStack([]);
   };
 
   return (
@@ -85,6 +85,7 @@ export const StackPage: React.FC = () => {
           disabled={stack.length === 0}
           extraClass={s.ml}
         />
+        <p></p>
       </form>
       <ul className={s.ul}>
         {

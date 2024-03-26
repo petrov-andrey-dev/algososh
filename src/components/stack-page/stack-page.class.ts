@@ -26,6 +26,6 @@ export class Stack<T> implements IStack<T> {
     };
 
     getItems = () => {
-        return this.items;
-    };
+        return this.items
+    }
 }
