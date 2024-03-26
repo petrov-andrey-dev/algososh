@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { HEAD, TAIL } from "../../constants/element-captions";
+import { useForm } from "../../hooks/useForm";
 import { TCircleObject } from "../../types/circle";
 import { ElementStates } from "../../types/element-states";
-import { mutateCircle, timeout } from "../../utils/utils";
+import { timeout } from "../../utils/utils";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { Input } from "../ui/input/input";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
+import { Queue } from "./queue-page.class";
 import s from "./queue-page.module.css";
-import { useForm } from "../../hooks/useForm";
 
 type TButtonsState = {
   enqueueBtn: boolean;
@@ -20,67 +21,46 @@ type TInput = {
   string: string;
 };
 
+const newQueue = new Queue<TCircleObject>(7, Array(7).fill({ value: '', state: ElementStates.Default }));
+
 export const QueuePage: React.FC = () => {
-  const [queue, setQueue] = useState<TCircleObject[]>(Array(7).fill({ value: '', state: ElementStates.Default }));
-  const [head, setHead] = useState<number>(-1);
-  const [tail, setTail] = useState<number>(-1);
+  const [queue, setQueue] = useState<TCircleObject[]>(newQueue.getItems());
   const {values, handleChange, setValues} = useForm<TInput>({string: ''});
   const [isLoading, setIsLoading] = useState<TButtonsState>({
     enqueueBtn: false,
     dequeueBtn: false
   });
 
-  const enqueue = async (item: string) => {
-    mutateCircle(setQueue, queue, tail + 1, ElementStates.Changing);
-    await timeout(SHORT_DELAY_IN_MS);
-    const newQueue = queue.slice(0, queue.length);
-    const newItem = { value: item, state: ElementStates.Default };
-    newQueue.splice(tail + 1, 1, newItem);
-    setQueue(newQueue);
-    if (head === -1 || queue[head].value === '') {
-      setHead(head + 1);
-    }
-    setTail(tail + 1);
-    setValues({string: ''});
-  };
-
-  const dequeue = async () => {
-    mutateCircle(setQueue, queue, head, ElementStates.Changing);
-    await timeout(SHORT_DELAY_IN_MS);
-    const newQueue = queue.slice();
-    const newItem = { value: '', state: ElementStates.Default };
-    newQueue.splice(head, 1, newItem);
-    setQueue(newQueue);
-    if (head < tail) {
-      setHead(head + 1)
-    }
-    if (head === tail) {
-      setHead(-1);
-      setTail(-1);
-    }
-  };
-
   const onAddButton = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (tail < queue.length - 1) {
+    if (newQueue.getTail() < newQueue.getSize()) {
       setIsLoading({ ...isLoading, enqueueBtn: true });
-      await enqueue(values.string);
+      setValues({string: ''});
+      newQueue.changeTailItem({value: '', state: ElementStates.Changing});
+      setQueue([...newQueue.getItems()]);
+      await timeout(SHORT_DELAY_IN_MS);
+      newQueue.enqueue({value: values.string, state: ElementStates.Default});
+      setQueue([...newQueue.getItems()]);
       setIsLoading({ ...isLoading, enqueueBtn: false });
     }
   };
 
   const onRemoveButton = async () => {
-    if (head <= tail) {
+    if (newQueue.getHead() <= newQueue.getTail()) {
       setIsLoading({ ...isLoading, dequeueBtn: true });
-      await dequeue();
+      newQueue.changeHeadItem({value: newQueue.getItems()[newQueue.getHead()].value, state: ElementStates.Changing});
+      setQueue([...newQueue.getItems()]);
+      console.log(newQueue.getItems()[newQueue.getHead()]);
+      await timeout(SHORT_DELAY_IN_MS);
+      newQueue.dequeue({value: '', state: ElementStates.Default});
+      setQueue([...newQueue.getItems()]);
       setIsLoading({ ...isLoading, dequeueBtn: false });
     }
   };
 
-  const onClearButton = async () => {
-    setQueue(Array(7).fill({ value: '', state: ElementStates.Default }));
-    setHead(-1);
-    setTail(-1);
+  const onClearButton = () => {
+    newQueue.clear(Array(7).fill({ value: '', state: ElementStates.Default }));
+    setQueue([...newQueue.getItems()]);
   };
 
 
@@ -98,18 +78,18 @@ export const QueuePage: React.FC = () => {
           text='Добавить'
           isLoader={isLoading.enqueueBtn}
           type='submit'
-          disabled={values.string.length === 0 || tail === queue.length - 1}
+          disabled={values.string.length === 0 || newQueue.getTail() === newQueue.getSize()}
         />
         <Button
           text='Удалить'
           isLoader={isLoading.dequeueBtn}
           onClick={onRemoveButton}
-          disabled={head < 0}
+          disabled={newQueue.getHead() < 0}
         />
         <Button
           text='Очистить'
           onClick={onClearButton}
-          disabled={head < 0}
+          disabled={newQueue.getHead() < 0}
           extraClass={s.ml}
         />
       </form>
@@ -122,8 +102,8 @@ export const QueuePage: React.FC = () => {
                   index={index}
                   letter={item.value}
                   state={item.state}
-                  head={index === head ? HEAD : ''}
-                  tail={index === tail ? TAIL : ''}
+                  head={index === newQueue.getHead() && item.value ? HEAD : ''}
+                  tail={index === newQueue.getTail() - 1 && item.value ? TAIL : ''}
                 />
               </li>
             )
