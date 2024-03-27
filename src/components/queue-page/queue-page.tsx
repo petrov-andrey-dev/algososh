@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SHORT_DELAY_IN_MS } from "../../constants/delays";
 import { HEAD, TAIL } from "../../constants/element-captions";
 import { useForm } from "../../hooks/useForm";
@@ -30,6 +30,10 @@ export const QueuePage: React.FC = () => {
     enqueueBtn: false,
     dequeueBtn: false
   });
+
+  useEffect(() => {
+    onClearButton();
+  }, []);
 
   const onAddButton = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

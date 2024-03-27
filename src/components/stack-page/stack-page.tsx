@@ -30,6 +30,10 @@ export const StackPage: React.FC = () => {
     popBtn: false
   });
 
+  useEffect(() => {
+    onClearButton();
+  }, [])
+
   const onAddButton = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading({ ...isLoading, pushBtn: true });
