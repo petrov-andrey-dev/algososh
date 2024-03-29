@@ -40,6 +40,30 @@ describe('Функция bubbleSort', () => {
         await bubbleSort(array, Direction.Descending, () => { });
         expect(array).toEqual(expected);
     });
+    it('сортировка массива с отрицательными числми по возрастанию', async () => {
+        const array = [-79, 43, -60, 6 ].map(char => ({ value: char, state: ElementStates.Default }));
+        const expected = [-79, -60, 6, 43].map(char => ({ value: char, state: ElementStates.Modified }));
+        await bubbleSort(array, Direction.Ascending, () => { });
+        expect(array).toEqual(expected);
+    });
+    it('сортировка массива с отрицательными числами по убыванию', async () => {
+        const array = [-79, 43, -60, 6 ].map(char => ({ value: char, state: ElementStates.Default }));
+        const expected = [43, 6, -60, -79].map(char => ({ value: char, state: ElementStates.Modified }));
+        await bubbleSort(array, Direction.Descending, () => { });
+        expect(array).toEqual(expected);
+    });
+    it('сортировка отсортированного массива по возрастанию', async () => {
+        const array = [1, 2, 3, 4 ].map(char => ({ value: char, state: ElementStates.Default }));
+        const expected = [1, 2, 3, 4 ].map(char => ({ value: char, state: ElementStates.Modified }));
+        await bubbleSort(array, Direction.Ascending, () => { });
+        expect(array).toEqual(expected);
+    });
+    it('сортировка отсортированного массива по убыванию', async () => {
+        const array = [4, 3, 2, 1].map(char => ({ value: char, state: ElementStates.Default }));
+        const expected = [4, 3, 2, 1].map(char => ({ value: char, state: ElementStates.Modified }));
+        await bubbleSort(array, Direction.Descending, () => { });
+        expect(array).toEqual(expected);
+    });
 });
 
 describe('Функция selectSort', () => {
@@ -76,6 +100,30 @@ describe('Функция selectSort', () => {
     it('сортировка массива из нескольких элементов по убыванию', async () => {
         const array = [79, 43, 60, 6 ].map(char => ({ value: char, state: ElementStates.Default }));
         const expected = [79, 60, 43, 6].map(char => ({ value: char, state: ElementStates.Modified }));
+        await selectSort(array, Direction.Descending, () => { });
+        expect(array).toEqual(expected);
+    });
+    it('сортировка массива с отрицательными числами по возрастанию', async () => {
+        const array = [-79, 43, -60, 6 ].map(char => ({ value: char, state: ElementStates.Default }));
+        const expected = [-79, -60, 6, 43].map(char => ({ value: char, state: ElementStates.Modified }));
+        await selectSort(array, Direction.Ascending, () => { });
+        expect(array).toEqual(expected);
+    });
+    it('сортировка массива с отрицательными числами по убыванию', async () => {
+        const array = [-79, 43, -60, 6 ].map(char => ({ value: char, state: ElementStates.Default }));
+        const expected = [43, 6, -60, -79].map(char => ({ value: char, state: ElementStates.Modified }));
+        await selectSort(array, Direction.Descending, () => { });
+        expect(array).toEqual(expected);
+    });
+    it('сортировка отсортированного массива по возрастанию', async () => {
+        const array = [1, 2, 3, 4 ].map(char => ({ value: char, state: ElementStates.Default }));
+        const expected = [1, 2, 3, 4].map(char => ({ value: char, state: ElementStates.Modified }));
+        await selectSort(array, Direction.Ascending, () => { });
+        expect(array).toEqual(expected);
+    });
+    it('сортировка отсортированного массива по убыванию', async () => {
+        const array = [4, 3, 2, 1].map(char => ({ value: char, state: ElementStates.Default }));
+        const expected = [4, 3, 2, 1].map(char => ({ value: char, state: ElementStates.Modified }));
         await selectSort(array, Direction.Descending, () => { });
         expect(array).toEqual(expected);
     });

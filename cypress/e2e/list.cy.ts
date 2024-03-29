@@ -1,4 +1,6 @@
 describe('Страница Связный список работает корректно', () => {
+  
+
   beforeEach(() => {
     cy.visit('/list');
     cy.get('[class^=circle_circle]').as('circle');
@@ -58,29 +60,30 @@ describe('Страница Связный список работает корр
   });
 
   it('Элемент добавляется по индексу правильно', () => {
-    cy.get('input').first().type('3');
+    cy.get('input').first().type('F');
     cy.get('input').last().type('1')
     cy.contains('Добавить по индексу').click();
+    cy.get('@circle').should('have.length', 5);
+    cy.get('@circle').first()
+      .should('have.css', 'border-color', 'rgb(210, 82, 225)')
+      .should('contain.text', 'F');
+      cy.get('@circle').eq(1)
+      .should('have.css', 'border-color', 'rgb(210, 82, 225)')
+      .should('contain.text', 'F');
     cy.get('@circle').eq(0)
       .should('have.css', 'border-color', 'rgb(210, 82, 225)')
-      .should('contain.text', '3');
-    cy.get('@circle').eq(1)
-      .should('have.css', 'border-color', 'rgb(210, 82, 225)')
-      .should('contain.text', '3');
-    cy.get('@circle').eq(0)
-      .should('have.css', 'border-color', 'rgb(210, 82, 225)')
-      .should('not.contain.text', '3')
+      .should('not.contain.text', 'F')
       .prev().should('contain', 'head');
     cy.get('@circle').eq(1)
       .should('have.css', 'border-color', 'rgb(127, 224, 81)')
-      .should('contain.text', '3');
+      .should('contain.text', 'F');
     cy.get('@circle').eq(0)
       .should('have.css', 'border-color', 'rgb(0, 50, 255)')
-      .should('not.contain.text', '3')
+      .should('not.contain.text', 'F')
       .prev().should('contain', 'head');
     cy.get('@circle').eq(1)
       .should('have.css', 'border-color', 'rgb(0, 50, 255)')
-      .should('contain.text', '3');
+      .should('contain.text', 'F');
     cy.contains('Добавить по индексу').should('be.disabled');
   });
 
@@ -108,7 +111,7 @@ describe('Страница Связный список работает корр
     });
   });
 
-  it('Элемент удаляется из tail правильно', () => {
+  it('Элемент удаляется по индексу правильно', () => {
     cy.get('@circle').eq(2).then(($p) => {
       const value = $p.text();
       cy.get('input').last().type('2')
