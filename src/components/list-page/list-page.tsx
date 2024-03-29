@@ -52,8 +52,12 @@ export const ListPage: React.FC = () => {
   });
 
   useEffect(() => {
-    if (linkedList.getSize() < 4) {
+    if (linkedList.getSize() <= 4) {
       randomArr(4 - linkedList.getSize(), 4 -linkedList.getSize()).map(i => linkedList.addToTail(i.toString()))
+    } else {
+      while (linkedList.getSize() > 4) {
+        linkedList.delFromHead();
+      }
     }
     setList(linkedList.toArray().map(i => {
       return { value: i.value, state: ElementStates.Default }
@@ -257,11 +261,11 @@ export const ListPage: React.FC = () => {
                         || index === 0 ? HEAD : null
                   }
                   tail={
-                    ((action.delFromHeadBtn && index === 0)
+                    (action.delFromHeadBtn && index === 0)
                       || (action.delFromTailBtn && index === list.length - 1)
                       || (action.delByIndexBtn && index === pointer)
                       ? <Circle isSmall={true} state={ElementStates.Changing} letter={deletingValue} />
-                      : null)
+                      : null
                         || index === list.length - 1 ? TAIL : null
                   }
                 />
