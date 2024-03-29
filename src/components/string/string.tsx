@@ -1,39 +1,26 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { DELAY_IN_MS } from "../../constants/delays";
 import { useForm } from "../../hooks/useForm";
 import { TCircleObject } from "../../types/circle";
 import { ElementStates } from "../../types/element-states";
-import { swap, timeout } from "../../utils/utils";
+import { timeout } from "../../utils/utils";
 import { Button } from "../ui/button/button";
 import { Circle } from "../ui/circle/circle";
 import { Input } from "../ui/input/input";
 import { SolutionLayout } from "../ui/solution-layout/solution-layout";
 import s from './string.module.css';
+import { reverseString } from "./strung.utils";
 
 type TInput = {
   string: string;
 }
 
-export const StringComponent: React.FC = () => {
+export const StringComponent = () => {
   const [array, setArray] = useState<TCircleObject[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const {values, handleChange} = useForm<TInput>({string: ''})
 
-  const reverseString = async (arr: TCircleObject[]) => {
-    let start: number = 0;
-    let end: number = arr.length -1;
 
-    while (start <= end) {
-      arr[start].state = arr[end].state = ElementStates.Changing;
-      setArray([...arr]);
-      await timeout(DELAY_IN_MS);
-      swap(arr, start, end);
-      arr[start].state = arr[end].state = ElementStates.Modified;
-      setArray([...arr]);
-      start++;
-      end--;
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,7 +30,7 @@ export const StringComponent: React.FC = () => {
     });
     setArray([...arr]);
     await timeout(DELAY_IN_MS);
-    await reverseString(arr);
+    await reverseString(arr, setArray);
     setIsLoading(false);
   };
   
